@@ -1,36 +1,13 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
   <title>Copy Poison As a Service</title>
-  <link href="https://rawgit.com/Semantic-Org/Semantic-UI/master/dist/semantic.min.css" rel="stylesheet">
+  <link href="./bundle.min.css" rel="stylesheet">
   <script src="https://copypoison.com/cp.js" async charset="utf-8" data-length="1" data-link="false"></script>
-  <style>
-    #background {
-      position: fixed;
-    }
-
-    #landing {
-      position: relative;
-      padding-top: 14%;
-    }
-
-    #landing .header {
-      font-size: 4rem;
-    }
-
-    #landing .description {
-      color: white;
-    }
-    #landing .description a {
-      color: white;
-      text-decoration: underline;
-    }
-  </style>
 </head>
 <body>
-  <div id="background"></div>
   <div id="landing" class="ui text container">
     <div class="ui two column centered grid">
       <div class="column"></div>
@@ -41,8 +18,7 @@
         <h2 class="description">Copy, paste your text and you'll get it protected, using <a href="https://copypoison.com/"><em>Copy Poison</em></a>!</h2>
       </div>
       <div class="four column centered row">
-        <div class="ui fluid right labeled left icon input">
-          <i class="copyright icon"></i>
+        <div class="ui fluid right labeled input">
           <input type="text" placeholder="Paste your text here and copy it again">
           <button class="ui tag label">
             Copy
@@ -51,61 +27,50 @@
       </div>
     </div>
   </div>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/trianglify/0.4.0/trianglify.min.js"></script>
   <script>
-    /* Fancy background */
-var pattern = Trianglify({
-  cell_size: 55,
-  width: window.innerWidth,
-  height: window.innerHeight,
-  seed: 'xg8tr'
-})
-var div = document.getElementById('background')
-div.appendChild(pattern.canvas())
+    /* Create poison */
+    var button = document.querySelector('#landing .input button')
+    var parent = document.querySelector('#landing .input')
+    var poisonOnCopy = poisonClick.bind(null, 1)
+    button.addEventListener('click', poisonClick, false)
+    document.addEventListener('copy', poisonOnCopy, false)
 
-/* Create poison */
-var button = document.querySelector('#landing .input button')
-var parent = document.querySelector('#landing .input')
-var poisonOnCopy = poisonClick.bind(null, 1)
-button.addEventListener('click', poisonClick, false)
-document.addEventListener('copy', poisonOnCopy, false)
-
-function poisonClick (e) {
-  button.removeEventListener('click', poisonClick, false)
-  document.removeEventListener('copy', poisonOnCopy, false)
-  
-  var input = document.querySelector('#landing .input input')
-  if (!input || !input.value.length) return
-  
-  input.value = poisoner(input.value)
-  input.setSelectionRange(0, input.value.length)
-  if (e !== 1) {
-    document.execCommand('copy')
-  }
-  
-  var ready = document.createElement('div')
-  ready.className = 'ui tag label green'
-  ready.textContent = 'Ready and copied'
-  parent.replaceChild(ready, button)
-}
-
-function poisoner (input) {
-  var chars = 'ABEKMHOΠPCTXaeĸopcyxIiJjSs'+'АВЕКМНОПРСТХаекорсухІіЈјЅѕ'
-  var middle = chars.length / 2
-  var poison = ''
-
-  for(var i = 0; i < input.length; i++) {
-    var index = chars.indexOf(input.charAt(i))
-    if(index === -1) {
-      poison += input.charAt(i)
-    } else if(index >= middle) {
-      poison += chars.charAt(index - middle)
-    } else {
-      poison += chars.charAt(index + middle)
+    function poisonClick (e) {
+      button.removeEventListener('click', poisonClick, false)
+      document.removeEventListener('copy', poisonOnCopy, false)
+      
+      var input = document.querySelector('#landing .input input')
+      if (!input || !input.value.length) return
+      
+      input.value = poisoner(input.value)
+      input.setSelectionRange(0, input.value.length)
+      if (e !== 1) {
+        document.execCommand('copy')
+      }
+      
+      var ready = document.createElement('div')
+      ready.className = 'ui tag label green'
+      ready.textContent = 'Ready and copied'
+      parent.replaceChild(ready, button)
     }
-  }
-  return poison
-}
+
+    function poisoner (input) {
+      var chars = 'ABEKMHOΠPCTXaeĸopcyxIiJjSs'+'АВЕКМНОПРСТХаекорсухІіЈјЅѕ'
+      var middle = chars.length / 2
+      var poison = ''
+
+      for(var i = 0; i < input.length; i++) {
+        var index = chars.indexOf(input.charAt(i))
+        if(index === -1) {
+          poison += input.charAt(i)
+        } else if(index >= middle) {
+          poison += chars.charAt(index - middle)
+        } else {
+          poison += chars.charAt(index + middle)
+        }
+      }
+      return poison
+    }
   </script>
 </body>
 </html>
